@@ -30,6 +30,7 @@ public class Card {
                 else
                     suit = Suit.Chervi;
             }
+            default -> throw new IllegalArgumentException("Number is " + number + " but must be less 54");
         }
     }
 
