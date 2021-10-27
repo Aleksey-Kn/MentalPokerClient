@@ -33,7 +33,6 @@ public class PokerClient extends Listener {
         client.connect(5000, ip, tcpPort);
         client.addListener(new PokerClient());
         client.sendTCP(true);
-        Log.DEBUG();
     }
 
     private PokerClient() {
@@ -50,7 +49,6 @@ public class PokerClient extends Listener {
                 t = SpecialMath.nod(p - 1, c);
                 d = (t[2] > 0 ? t[2] : t[2] % (p - 1) + (p - 1));
             } while (t[0] != 1);
-            System.out.println((long) c * d % (p - 1));
         } else if (object instanceof ArrayList) {
             ArrayList<Integer> cards = (ArrayList<Integer>) object;
             for (int i = 0; i < cards.size(); i++) {
@@ -73,9 +71,6 @@ public class PokerClient extends Listener {
         } else if (object instanceof DecodingMessage) {
             DecodingMessage decodingMessage = (DecodingMessage) object;
             if (decodingMessage.getOwnerID() == connection.getID()) {
-                System.out.println("Clear message: " + decodingMessage.getMessage());
-                System.out.println("D: " + d);
-                System.out.println("P: " + p);
                 System.out.println(new Card(SpecialMath.powOnModule(decodingMessage.getMessage(), d, p)));
                 if (++printCount == 2) {
                     client.stop();
