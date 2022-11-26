@@ -7,6 +7,7 @@ import com.esotericsoftware.kryonet.Listener;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -24,6 +25,7 @@ public class PokerClient extends Listener {
         client.getKryo().register(Long.class);
         client.getKryo().register(DecodingMessage.class);
         client.getKryo().register(Boolean.class);
+        client.getKryo().register(Integer[].class);
         mainThread = new Thread(client);
         mainThread.start();
         client.start();
@@ -50,9 +52,7 @@ public class PokerClient extends Listener {
             } while (t[0] != 1);
         } else if (object instanceof ArrayList) {
             ArrayList<Integer> cards = (ArrayList<Integer>) object;
-            for (int i = 0; i < cards.size(); i++) {
-                cards.set(i, SpecialMath.powOnModule(cards.get(i), c, p));
-            }
+            cards.replaceAll(a -> SpecialMath.powOnModule(a, c, p));
             Supplier<Integer> randomIndex = () -> Math.abs(random.nextInt()) % cards.size();
             for (int i = 0, temp, x = randomIndex.get(), y = randomIndex.get(); i < cards.size();
                  i++, x = randomIndex.get(), y = randomIndex.get()) {
@@ -71,14 +71,16 @@ public class PokerClient extends Listener {
             DecodingMessage decodingMessage = (DecodingMessage) object;
             if (decodingMessage.getOwnerID() == connection.getID()) {
                 System.out.println(new Card(SpecialMath.powOnModule(decodingMessage.getMessage(), d, p)));
-                if (++printCount == 2) {
-                    client.stop();
-                    mainThread.interrupt();
-                }
             } else {
                 decodingMessage.setMessage(SpecialMath.powOnModule(decodingMessage.getMessage(), d, p));
                 connection.sendTCP(decodingMessage);
             }
+        } else if(object instanceof Integer[]) {
+            connection.sendTCP(Arrays.stream((Integer[]) object)
+                    .map(val -> SpecialMath.powOnModule(val, d, p))
+                    .toArray(Integer[]::new));
+            client.stop();
+            mainThread.interrupt();
         }
     }
 }
