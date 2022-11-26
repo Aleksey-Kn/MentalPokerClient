@@ -79,8 +79,6 @@ public class PokerClient extends Listener {
             connection.sendTCP(Arrays.stream((Integer[]) object)
                     .map(val -> SpecialMath.powOnModule(val, d, p))
                     .toArray(Integer[]::new));
-            client.stop();
-            mainThread.interrupt();
         }
     }
 }
